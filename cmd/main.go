@@ -17,9 +17,7 @@ func main() {
 	orderBookService := orderbook.CreateOrderBookService()
 	orderBookService.FetchOrderBooks()
 
-	service := api.OrderBookWebSocketService{
-		orderBookService,
-	}
+	service := api.CreateWebSocketService(orderBookService)
 
 	http.HandleFunc("/ws", service.Handle)
 
@@ -29,6 +27,6 @@ func main() {
 		fmt.Println("Error starting server:", err)
 	}
 
-	select {}
+	//select {}
 
 }

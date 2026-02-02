@@ -13,7 +13,23 @@ type SnapShotService interface {
 type BinanceSnapShotService struct {
 }
 
-func ConvertSnapShotResponseToSnapShot(response models.SnapshotResponse) (domain.SnapShot, error) {
+func (snap *BinanceSnapShotService) GetSnapShotBySymbol(symbol string) (domain.SnapShot, error) {
+	response, err := fetcher.FetchSnapShotBySymbol(symbol)
+
+	if err != nil {
+		return domain.SnapShot{}, err
+	}
+
+	snapshot, convError := convertSnapShotResponseToSnapShot(response)
+
+	if convError != nil {
+		return domain.SnapShot{}, convError
+	}
+
+	return snapshot, nil
+}
+
+func convertSnapShotResponseToSnapShot(response models.SnapshotResponse) (domain.SnapShot, error) {
 	bids, err := domain.ConvertArrayToBidAsk(response.Bids)
 	asks, err := domain.ConvertArrayToBidAsk(response.Asks)
 
@@ -28,21 +44,5 @@ func ConvertSnapShotResponseToSnapShot(response models.SnapshotResponse) (domain
 		Bids:              bids,
 		Asks:              asks,
 	}
-	return snapshot, nil
-}
-
-func (snap *BinanceSnapShotService) GetSnapShotBySymbol(symbol string) (domain.SnapShot, error) {
-	response, err := fetcher.FetchSnapShotBySymbol(symbol)
-
-	if err != nil {
-		return domain.SnapShot{}, err
-	}
-
-	snapshot, convError := ConvertSnapShotResponseToSnapShot(response)
-
-	if convError != nil {
-		return domain.SnapShot{}, convError
-	}
-
 	return snapshot, nil
 }
