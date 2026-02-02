@@ -1,9 +1,10 @@
 package depth
 
 import (
+	"strings"
+
 	"binance-gateway/internal/domain"
 	"binance-gateway/internal/services/depth/fetcher"
-	"strings"
 )
 
 type DepthService interface {

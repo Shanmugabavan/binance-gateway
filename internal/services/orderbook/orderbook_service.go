@@ -1,14 +1,15 @@
 package orderbook
 
 import (
-	"binance-gateway/configs"
-	"binance-gateway/internal/domain"
-	"binance-gateway/internal/services/depth"
-	"binance-gateway/internal/services/snapshot"
 	"errors"
 	"fmt"
 	"log"
 	"sync"
+
+	"binance-gateway/configs"
+	"binance-gateway/internal/domain"
+	"binance-gateway/internal/services/depth"
+	"binance-gateway/internal/services/snapshot"
 )
 
 type OrderBookService interface {
@@ -45,7 +46,12 @@ func (orderBookService *BinanceOrderBookService) InitiateOrderBook(symbol string
 
 	orderBook.Snapshot = snapShot
 
-	go orderBookService.applyBufferedEvents(&orderBook)
+	go func() {
+		err := orderBookService.applyBufferedEvents(&orderBook)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	return &orderBook, nil
 
@@ -160,11 +166,9 @@ func (orderBookService *BinanceOrderBookService) FetchOrderBooks() {
 }
 
 func CreateOrderBookService() *BinanceOrderBookService {
-	var snapshotService snapshot.SnapShotService
-	snapshotService = &snapshot.BinanceSnapShotService{}
+	var snapshotService snapshot.SnapShotService = &snapshot.BinanceSnapShotService{}
 
-	var depthService depth.DepthService
-	depthService = &depth.BinanceDepthService{}
+	var depthService depth.DepthService = &depth.BinanceDepthService{}
 
 	orderBooksDic := make(map[string]*domain.OrderBook)
 

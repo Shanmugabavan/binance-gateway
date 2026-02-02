@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+
 	"binance-gateway/api"
 	"binance-gateway/bootstrap"
 	"binance-gateway/configs"
 	"binance-gateway/internal/services/orderbook"
-	"fmt"
-	"net/http"
 )
 
 func main() {

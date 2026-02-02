@@ -1,11 +1,12 @@
 package fetcher
 
 import (
-	"binance-gateway/bootstrap"
-	"binance-gateway/internal/services/snapshot/fetcher/models"
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"binance-gateway/bootstrap"
+	"binance-gateway/internal/services/snapshot/fetcher/models"
 )
 
 func FetchSnapShotBySymbol(symbol string) (models.SnapshotResponse, error) {

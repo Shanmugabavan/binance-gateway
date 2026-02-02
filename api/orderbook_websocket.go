@@ -1,8 +1,6 @@
 package api
 
 import (
-	"binance-gateway/internal/domain"
-	"binance-gateway/internal/services/orderbook"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -10,6 +8,9 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
+
+	"binance-gateway/internal/domain"
+	"binance-gateway/internal/services/orderbook"
 )
 
 var upgrader = websocket.Upgrader{
@@ -30,7 +31,12 @@ type OrderBookWebSocketService struct {
 
 func (orderBookWebSocketService *OrderBookWebSocketService) Handle(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
-	defer conn.Close()
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+			log.Println("Error closing websocket connection")
+		}
+	}(conn)
 
 	channel := make(chan domain.Depth)
 

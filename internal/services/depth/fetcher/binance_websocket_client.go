@@ -1,15 +1,16 @@
 package fetcher
 
 import (
-	"binance-gateway/bootstrap"
-	"binance-gateway/internal/domain"
-	"binance-gateway/internal/services/depth/fetcher/models"
 	"encoding/json"
 	"log"
 	"net/url"
 	"strings"
 
 	"github.com/gorilla/websocket"
+
+	"binance-gateway/bootstrap"
+	"binance-gateway/internal/domain"
+	"binance-gateway/internal/services/depth/fetcher/models"
 )
 
 func FetchDepthStream(symbol string, channel chan<- domain.Depth) {
@@ -48,10 +49,13 @@ func writeToChannel(conn *websocket.Conn, channel chan<- domain.Depth) {
 			log.Println("jsonErr:", jsonErr)
 		}
 
-		bids, err := domain.ConvertArrayToBidAsk(response.Bids)
-		asks, err := domain.ConvertArrayToBidAsk(response.Asks)
+		bids, convertErr := domain.ConvertArrayToBidAsk(response.Bids)
+		asks, convertErr2 := domain.ConvertArrayToBidAsk(response.Asks)
 
-		if err != nil {
+		if convertErr != nil {
+			log.Println("ConvertArrayToBidAsk:", err)
+		}
+		if convertErr2 != nil {
 			log.Println("ConvertArrayToBidAsk:", err)
 		}
 

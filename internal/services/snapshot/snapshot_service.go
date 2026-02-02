@@ -30,11 +30,15 @@ func (snap *BinanceSnapShotService) GetSnapShotBySymbol(symbol string) (domain.S
 }
 
 func convertSnapShotResponseToSnapShot(response models.SnapshotResponse) (domain.SnapShot, error) {
-	bids, err := domain.ConvertArrayToBidAsk(response.Bids)
-	asks, err := domain.ConvertArrayToBidAsk(response.Asks)
+	bids, err1 := domain.ConvertArrayToBidAsk(response.Bids)
+	asks, err2 := domain.ConvertArrayToBidAsk(response.Asks)
 
-	if err != nil {
-		return domain.SnapShot{}, err
+	if err1 != nil {
+		return domain.SnapShot{}, err1
+	}
+
+	if err2 != nil {
+		return domain.SnapShot{}, err2
 	}
 
 	snapshot := domain.SnapShot{
