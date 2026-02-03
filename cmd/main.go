@@ -1,10 +1,10 @@
 package main
 
 import (
+	"binance-gateway/internal/ws"
 	"fmt"
 	"net/http"
 
-	"binance-gateway/api"
 	"binance-gateway/bootstrap"
 	"binance-gateway/configs"
 	"binance-gateway/internal/services/orderbook"
@@ -18,7 +18,7 @@ func main() {
 	orderBookService := orderbook.CreateOrderBookService()
 	orderBookService.FetchOrderBooks()
 
-	service := api.CreateWebSocketService(orderBookService)
+	service := ws.CreateWebSocketService(orderBookService)
 
 	http.HandleFunc("/ws", service.Handle)
 

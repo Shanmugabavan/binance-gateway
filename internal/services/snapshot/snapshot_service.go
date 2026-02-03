@@ -3,7 +3,7 @@ package snapshot
 import (
 	"binance-gateway/internal/domain"
 	"binance-gateway/internal/services/snapshot/fetcher"
-	"binance-gateway/internal/services/snapshot/fetcher/models"
+	"binance-gateway/internal/services/snapshot/fetcher/dto"
 )
 
 type SnapShotService interface {
@@ -29,7 +29,7 @@ func (snap *BinanceSnapShotService) GetSnapShotBySymbol(symbol string) (domain.S
 	return snapshot, nil
 }
 
-func convertSnapShotResponseToSnapShot(response models.SnapshotResponse) (domain.SnapShot, error) {
+func convertSnapShotResponseToSnapShot(response dto.SnapshotResponse) (domain.SnapShot, error) {
 	bids, err1 := domain.ConvertArrayToBidAsk(response.Bids)
 	asks, err2 := domain.ConvertArrayToBidAsk(response.Asks)
 

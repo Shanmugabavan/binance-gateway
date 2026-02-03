@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"binance-gateway/bootstrap"
-	"binance-gateway/internal/services/snapshot/fetcher/models"
+	"binance-gateway/internal/services/snapshot/fetcher/dto"
 )
 
-func FetchSnapShotBySymbol(symbol string) (models.SnapshotResponse, error) {
-	snapshotResponse := models.SnapshotResponse{}
+func FetchSnapShotBySymbol(symbol string) (dto.SnapshotResponse, error) {
+	snapshotResponse := dto.SnapshotResponse{}
 	env := bootstrap.EnvironmentSingleton
 	resp, err2 := http.Get(env.BinanceBaseURL + "/api/v3/depth?symbol=" + symbol)
 

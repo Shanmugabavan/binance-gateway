@@ -1,4 +1,4 @@
-package models
+package dto
 
 type DepthWSResponse struct {
 	EventType     string      `json:"e"`
