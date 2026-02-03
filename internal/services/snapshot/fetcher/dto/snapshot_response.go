@@ -1,4 +1,4 @@
-package models
+package dto
 
 type SnapshotResponse struct {
 	LastUpdateId      int64       `json:"lastUpdateId"`

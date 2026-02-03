@@ -10,7 +10,7 @@ import (
 
 	"binance-gateway/bootstrap"
 	"binance-gateway/internal/domain"
-	"binance-gateway/internal/services/depth/fetcher/models"
+	"binance-gateway/internal/services/depth/fetcher/dto"
 )
 
 func FetchDepthStream(symbol string, channel chan<- domain.Depth) {
@@ -37,7 +37,7 @@ func writeToChannel(conn *websocket.Conn, channel chan<- domain.Depth) {
 	for {
 		_, message, err := conn.ReadMessage()
 
-		response := models.DepthWSResponse{}
+		response := dto.DepthWSResponse{}
 
 		if err != nil {
 			log.Println("read:", err)
