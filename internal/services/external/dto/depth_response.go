@@ -1,4 +1,4 @@
-package dto
+package external
 
 type DepthWSResponse struct {
 	EventType     string      `json:"e"`

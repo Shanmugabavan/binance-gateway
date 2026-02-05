@@ -1,4 +1,4 @@
-package dto
+package external
 
 type SnapshotResponse struct {
 	LastUpdateId      int64       `json:"lastUpdateId"`
