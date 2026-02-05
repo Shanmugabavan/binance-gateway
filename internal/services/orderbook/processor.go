@@ -1,14 +1,13 @@
 package orderbook
 
 import (
+	"binance-gateway/configs"
+	"binance-gateway/internal/domain"
 	"binance-gateway/internal/services/external"
 	"errors"
 	"fmt"
 	"log"
 	"sync"
-
-	"binance-gateway/configs"
-	"binance-gateway/internal/domain"
 )
 
 type exchangeClient interface {
@@ -19,15 +18,19 @@ type exchangeClient interface {
 type BinanceOrderBookProcessor struct {
 	ExchangeClient exchangeClient
 	OrderBooks     map[string]*domain.OrderBook
-	mutex          sync.Mutex
+	Mutex          sync.Mutex
 }
 
+// Lock the OrderBookProcessor and add the new orderbook for the symbol
+// With the goroutine it will fetch depth stream and feed it to given depth channel
+// Snapshot will be fetch.
+// With the goroutine which will apply buffered events to orderbook.
 func (orderBookProcessor *BinanceOrderBookProcessor) InitiateOrderBook(symbol string) (*domain.OrderBook, error) {
 	orderBook := domain.OrderBook{}
 
-	orderBookProcessor.mutex.Lock()
+	orderBookProcessor.Mutex.Lock()
 	orderBookProcessor.OrderBooks[symbol] = &orderBook
-	orderBookProcessor.mutex.Unlock()
+	orderBookProcessor.Mutex.Unlock()
 
 	orderBook.DepthChan = make(chan domain.Depth)
 	orderBook.Symbol = symbol
@@ -53,6 +56,7 @@ func (orderBookProcessor *BinanceOrderBookProcessor) InitiateOrderBook(symbol st
 
 }
 
+// This method will deque the depth channel then update the order book snapshot and subscribed channels.
 func (orderBookProcessor *BinanceOrderBookProcessor) applyBufferedEvents(orderbook *domain.OrderBook) error {
 	for depthUpdate := range orderbook.DepthChan {
 		// skipping old events
@@ -83,6 +87,7 @@ func (orderBookProcessor *BinanceOrderBookProcessor) applyBufferedEvents(orderbo
 	return nil
 }
 
+// This method will update the associated snapshot with incoming events.
 func (orderBookProcessor *BinanceOrderBookProcessor) applyUpdateEvent(orderBook *domain.OrderBook, update domain.Depth) {
 	for i, bid := range update.Bids {
 		if bid.Quantity == 0.0 {
@@ -121,6 +126,7 @@ func (orderBookProcessor *BinanceOrderBookProcessor) InitiateClientWebSocketSubs
 	return currentSnapshot, nil
 }
 
+// This will safely unsubscribe the orderbook subscription with locking mechanisms.
 func (orderBookProcessor *BinanceOrderBookProcessor) RemoveClientWebSocketSubscription(symbol string, channel *chan domain.Depth) error {
 	orderBook, found := orderBookProcessor.OrderBooks[symbol]
 	if !found {
@@ -144,6 +150,7 @@ func (orderBookProcessor *BinanceOrderBookProcessor) RemoveClientWebSocketSubscr
 	return nil
 }
 
+// Loop through the subscribed channels and queue the latest depth event.
 func (orderBookProcessor *BinanceOrderBookProcessor) updateSubscriptionChannels(orderBook *domain.OrderBook, depth domain.Depth) {
 	for _, sub := range orderBook.Subscribers {
 		*sub <- depth
@@ -165,11 +172,11 @@ func CreateOrderBookProcessor() *BinanceOrderBookProcessor {
 	exchangeClient := external.BinanceExchangeClient{}
 	orderBooksDic := make(map[string]*domain.OrderBook)
 
-	orderBookService := BinanceOrderBookProcessor{
+	orderBookProcessor := BinanceOrderBookProcessor{
 		&exchangeClient,
 		orderBooksDic,
 		sync.Mutex{},
 	}
 
-	return &orderBookService
+	return &orderBookProcessor
 }
