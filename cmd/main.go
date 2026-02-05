@@ -15,19 +15,17 @@ func main() {
 
 	configs.InitConfiguration()
 
-	orderBookService := orderbook.CreateOrderBookService()
-	orderBookService.FetchOrderBooks()
+	orderBookProcessor := orderbook.CreateOrderBookProcessor()
+	orderBookProcessor.FetchOrderBooks()
 
-	service := ws.CreateWebSocketService(orderBookService)
+	wsProcessor := ws.CreateWebSocketProcessor(orderBookProcessor)
 
-	http.HandleFunc("/ws", service.Handle)
+	http.HandleFunc("/ws", wsProcessor.Handle)
 
 	fmt.Println("WebSocket server started on :8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 	}
-
-	//select {}
 
 }
