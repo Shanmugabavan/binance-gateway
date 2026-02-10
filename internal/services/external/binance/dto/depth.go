@@ -1,6 +1,6 @@
 package external
 
-type DepthWSResponse struct {
+type Depth struct {
 	EventType     string      `json:"e"`
 	EventTime     int64       `json:"E"`
 	Symbol        string      `json:"s"`

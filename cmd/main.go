@@ -1,7 +1,8 @@
 package main
 
 import (
-	"binance-gateway/internal/ws"
+	"binance-gateway/internal/services/client"
+	"binance-gateway/internal/services/external/binance"
 	"fmt"
 	"net/http"
 
@@ -15,12 +16,14 @@ func main() {
 
 	configs.InitConfiguration()
 
-	orderBookProcessor := orderbook.CreateOrderBookProcessor()
+	binanceClient := binance.NewExchangeClient()
+
+	orderBookProcessor := orderbook.NewProcessor(binanceClient)
 	orderBookProcessor.FetchOrderBooks()
 
-	wsProcessor := ws.CreateWebSocketProcessor(orderBookProcessor)
+	clientManager := client.NewManager(orderBookProcessor)
 
-	http.HandleFunc("/ws", wsProcessor.Handle)
+	http.HandleFunc("/ws", clientManager.Handle)
 
 	fmt.Println("WebSocket server started on :8080")
 	err := http.ListenAndServe(":8080", nil)

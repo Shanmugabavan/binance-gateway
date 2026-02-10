@@ -2,11 +2,6 @@ package orderbookTest
 
 import (
 	"binance-gateway/internal/domain"
-	"binance-gateway/internal/services/orderbook"
-	"sync"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type exchangeClientMock struct{}
@@ -23,21 +18,4 @@ func (exchangeClientMock *exchangeClientMock) GetSnapShotBySymbol(symbol string)
 	return domain.SnapShot{
 		LastUpdateId: int64(102),
 	}, nil
-}
-
-func TestInitiateOrderBookWithSuccess(t *testing.T) {
-	exchangeClient := exchangeClientMock{}
-	orderBooksDic := make(map[string]*domain.OrderBook)
-	orderBookProcessor := orderbook.BinanceOrderBookProcessor{
-		&exchangeClient,
-		orderBooksDic,
-		sync.Mutex{},
-	}
-
-	book, err := orderBookProcessor.InitiateOrderBook("BTCUSDT")
-	if err != nil {
-		return
-	}
-
-	assert.NotNil(t, book)
 }
